@@ -29,27 +29,41 @@ const fetchMyIP = function(callback) {
 const fetchCoordsByIP = function(ip, callback) {
   request(`http://ipwho.is/${ip}`, (error, response, body) => {
     if (error) {
-      console.log(error)
-      callback(error, null)
+      console.log(error);
+      callback(error, null);
     }
     if (response.statusCode !== 200) {
-      console.log(response.statusCode)
-      callback(response.statusCode, null)
+      console.log(response.statusCode);
+      callback(response.statusCode, null);
     }
     const parsedBody = JSON.parse(body);
     if (!parsedBody.success) {
       const message = `Success status was ${parsedBody.success}. Server message says: ${parsedBody.message} when fetching for IP ${parsedBody.ip}`;
-      callback(Error(message), null)
+      callback(Error(message), null);
       return;
     }
-    const latitude = parsedBody["latitude"]
-    const longitude = parsedBody['longitude']
-    result = { latitude, longitude }
-  })
-}
+    const {latitude, longitude} = parsedBody;
+    callback(null, {latitude, longitude});
+  });
+};
+
+
+const fetchISSFlyOverTimes = function(coordinates, callback) {
+  request(`https://iss-flyover.herokuapp.com/json/?lat=${coordinates.latitude}&lon=${coordinates.longitude}`, (error, response, body) => {
+    if (error) {
+      console.log(error);
+      callback(error, null);
+      return;
+    }
+    const parsedBody = JSON.parse(body);
+    callback(null, parsedBody.response);
+  });
+};
+// coordinates =  { latitude: 49.2827291, longitude: -123.1207375 }
+// coordinates =  { latitude: 99.2827291, longitude: -123.1207375 }
 
 // console.log(fetchCoordsByIP('69.172.174.57', null))
 
 
 
-module.exports = { fetchMyIP, fetchCoordsByIP };
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
