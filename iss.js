@@ -51,9 +51,12 @@ const fetchCoordsByIP = function(ip, callback) {
 const fetchISSFlyOverTimes = function(coordinates, callback) {
   request(`https://iss-flyover.herokuapp.com/json/?lat=${coordinates.latitude}&lon=${coordinates.longitude}`, (error, response, body) => {
     if (error) {
-      console.log(error);
       callback(error, null);
       return;
+    }
+    if (response.statusCode !== 200) {
+      console.log(response.statusCode);
+      callback(`Status Code ${response.statusCode} when fetching ISS pass time: ${body}`, null);
     }
     const parsedBody = JSON.parse(body);
     callback(null, parsedBody.response);
