@@ -17,7 +17,7 @@ const fetchMyIP = function(callback) {
     //if non-200 status, assume server error
     if (response.statusCode !== 200) {
       const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
-      callback(Error(msg), null);//Error() creates a new Error objec that we can pass around. In this case we pass it back to the callback to indicate that something went wrong
+      callback(Error(msg), null);//Error() creates a new Error object that we can pass around. In this case we pass it back to the callback to indicate that something went wrong
       return;
     }
     const data = JSON.parse(body);//converts the string into an object
@@ -29,9 +29,21 @@ const fetchMyIP = function(callback) {
 const fetchCoordsByIP = function(ip, callback) {
   request(`http://ipwho.is/${ip}`, (error, response, body) => {
     if (error) {
-      console.log(error, null)
+      console.log(error)
+      callback(error, null)
+    }
+    if (response.statusCode !== 200) {
+      console.log(response.statusCode)
+      callback(response.statusCode, null)
     }
     const data = JSON.parse(body);
+    if (data['success'] === false) {
+      const message = 'Invalid IP address'
+      callback(Error(message), message)
+      return;
+    }
+    
+    console.log(data)
     const latitude = data["latitude"]
     const longitude = data['longitude']
     console.log(latitude)
@@ -42,7 +54,7 @@ const fetchCoordsByIP = function(ip, callback) {
 }
 
 // console.log(fetchCoordsByIP('69.172.174.57', null))
-console.log(fetchCoordsByIP('42', null))
+console.log(fetchCoordsByIP('42', (x) => {console.log(x)}))
 
 
 module.exports = { fetchMyIP, fetchCoordsByIP };

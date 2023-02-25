@@ -12,5 +12,6 @@ fetchCoordsByIP((ip, error) => {
   if (error) {
     console.log(error)
   }
+  
   console.log(ip)
 })
