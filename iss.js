@@ -36,25 +36,20 @@ const fetchCoordsByIP = function(ip, callback) {
       console.log(response.statusCode)
       callback(response.statusCode, null)
     }
-    const data = JSON.parse(body);
-    if (data['success'] === false) {
-      const message = 'Invalid IP address'
-      callback(Error(message), message)
+    const parsedBody = JSON.parse(body);
+    if (!parsedBody.success) {
+      const message = `Success status was ${parsedBody.success}. Server message says: ${parsedBody.message} when fetching for IP ${parsedBody.ip}`;
+      callback(Error(message), null)
       return;
     }
-    
-    console.log(data)
-    const latitude = data["latitude"]
-    const longitude = data['longitude']
-    console.log(latitude)
-    console.log(longitude)
+    const latitude = parsedBody["latitude"]
+    const longitude = parsedBody['longitude']
     result = { latitude, longitude }
-    console.log(result)
   })
 }
 
 // console.log(fetchCoordsByIP('69.172.174.57', null))
-console.log(fetchCoordsByIP('42', (x) => {console.log(x)}))
+
 
 
 module.exports = { fetchMyIP, fetchCoordsByIP };
